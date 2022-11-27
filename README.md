@@ -45,7 +45,18 @@ services:
       - ./data:/data
 ```
 
-## 2. server.properties 파일 예제
+***
+## 2. 마인크래프트 도커 실행하기
+
+```
+$ cd /data/minecraft/mc
+
+$ sudo docker-compose up -d
+
+```
+
+***
+## 3. server.properties 파일 예제
 
 - 커스텀 motd 만들기: https://minecraft.tools/en/motd.php
 
@@ -115,7 +126,8 @@ spawn-protection=0
 max-world-size=29999984
 ```
 
-## 3. setop.sh 명령어
+***
+## 4. setop.sh 명령어
 
 특정 유저에게 op 권한을 부여하는 명령어
 
@@ -125,7 +137,8 @@ sudo docker exec mc mc-send-to-console op user1
 sudo docker exec mc mc-send-to-console op user2
 ```
 
-## 4. whojoin.sh 스크립트
+***
+## 5. whojoin.sh 스크립트
 
 마인크래프트 서버에 유저가 참가(join)하거나 퇴장(left)하면.  
 텔레그램으로 알려주는 스크립트
@@ -150,7 +163,8 @@ else
 fi
 ```
 
-telegram-send.sh 스크립트 파일
+***
+## 6. telegram-send.sh 스크립트
 
 ```
 #!/usr/bin/bash
@@ -187,7 +201,8 @@ curl -s \
 
 ```
 
-반복 수행을 하기 위한 crontab 설정
+***
+## 7. 반복 수행을 하기 위한 crontab 설정
 
 ```
 $ sudo crontab -e
@@ -206,7 +221,8 @@ $ sudo crontab -l
 ```
 
 
-## 5. 디렉토리 구조
+***
+## 8. 디렉토리 구조
 
 ```
 $ tree /data/minecraft/
@@ -375,8 +391,8 @@ $ tree /data/minecraft/
     └── whojoin.sh
 ```
 
-***
 
+***
 ## 참고 URL
 
 - 10초만에 마인크래프트 서버 만들기: https://hibuz.com/minecraft_bedrock_docker_server/
