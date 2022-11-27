@@ -185,6 +185,22 @@ curl -s \
 
 ```
 
+반복 수행을 하기 위한 crontab 설정
+
+```
+$ sudo crontab -e
+
+$ sudo crontab -l
+# m h  dom mon dow   command
+# │ │  │   │   └── day of week(0-7, 0=7=sunday)
+# │ │  │   └── month(1-12)
+# │ │  └── dates of month(1-31)
+# │ └── hours(0-23)
+# └── minutes(0-59)
+
+* * * * * /data/minecraft/mc/whojoin.sh
+```
+
 
 ## 5. 디렉토리 구조
 
