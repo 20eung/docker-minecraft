@@ -41,7 +41,7 @@ services:
       - EULA=TRUE
     volumes:
       - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+      - /usr/share/zoneinfo/Asia/Seoul:/etc/localtime:ro
       - ./data:/data
 ```
 
@@ -149,17 +149,16 @@ HOME='/data/minecraft/mc'
 JOINS=`grep -E "joined | left" ${HOME}/data/logs/latest.log | wc -l`
 JOINS_OLD=`cat ${HOME}/data/join.dat`
 
-if [ $JOINS -eq $JOINS_OLD ]
-then
+if [ "${JOINS}" == "${JOINS_OLD}" ]; then
   echo "Equal"
 else
   echo "Diff"
-  echo $JOINS > ${HOME}/data/join.dat
+  echo ${JOINS} > ${HOME}/data/join.dat
 
   LAST=`grep -E "joined | left" ${HOME}/data/logs/latest.log | tail -1`
-  JOIN='['${HOSTNAME}'] '${LAST}
-  echo $JOIN
-  ${HOME}/telegram-send.sh "$JOIN"
+  JOIN='['${HOSTNAME}'-mc1] '${LAST}
+  echo ${JOIN}
+  ${HOME}/telegram-send.sh "${JOIN}"
 fi
 ```
 
