@@ -47,6 +47,8 @@ services:
 
 ## 2. server.properties 파일 예제
 
+- 커스텀 motd 만들기: https://minecraft.tools/en/motd.php
+
 ```
 #Minecraft server properties
 enable-jmx-monitoring=false
