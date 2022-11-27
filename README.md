@@ -191,13 +191,15 @@ curl -s \
 $ sudo crontab -e
 
 $ sudo crontab -l
+
 # m h  dom mon dow   command
 # │ │  │   │   └── day of week(0-7, 0=7=sunday)
 # │ │  │   └── month(1-12)
 # │ │  └── dates of month(1-31)
 # │ └── hours(0-23)
 # └── minutes(0-59)
-
+#
+# 매분마다 실행
 * * * * * /data/minecraft/mc/whojoin.sh
 ```
 
