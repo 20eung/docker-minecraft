@@ -374,3 +374,10 @@ $ tree /data/minecraft/
     ├── telegramsend.sh
     └── whojoin.sh
 ```
+
+***
+
+## 참고 URL
+
+- 10초만에 마인크래프트 서버 만들기: https://hibuz.com/minecraft_bedrock_docker_server/
+- 마인크래프트 서버 설치 (Ubuntu 18.04): https://www.clien.net/service/board/cm_linux/15430979
