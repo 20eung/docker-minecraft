@@ -151,7 +151,7 @@ fi
 telegram-send.sh 스크립트 파일
 
 ```
-#!/bin/bash
+#!/usr/bin/bash
 
 GROUP_ID='그룹ID 찾는 법은 구글링해서 찾으시길...'
 BOT_TOKEN='봇 토큰 찾는 법도 구글링해서 찾으시길...'
@@ -186,7 +186,7 @@ curl -s \
 ```
 
 
-## 4. 디렉토리 구조
+## 5. 디렉토리 구조
 
 ```
 $ tree /data/minecraft/
