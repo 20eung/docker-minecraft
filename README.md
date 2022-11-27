@@ -123,6 +123,69 @@ sudo docker exec mc mc-send-to-console op user1
 sudo docker exec mc mc-send-to-console op user2
 ```
 
+## 4. whojoin.sh 스크립트
+
+마인크래프트 서버에 유저가 참가(join)하거나 퇴장(left)하면.  
+텔레그램으로 알려주는 스크립트
+
+```
+#!/usr/bin/bash
+HOME='/data/minecraft/mc'
+JOINS=`grep -E "joined | left" ${HOME}/data/logs/latest.log | wc -l`
+JOINS_OLD=`cat ${HOME}/data/join.dat`
+
+if [ $JOINS -eq $JOINS_OLD ]
+then
+  echo "Equal"
+else
+  echo "Diff"
+  echo $JOINS > ${HOME}/data/join.dat
+
+  LAST=`grep -E "joined | left" ${HOME}/data/logs/latest.log | tail -1`
+  JOIN='['${HOSTNAME}'] '${LAST}
+  echo $JOIN
+  ${HOME}/telegram-send.sh "$JOIN"
+fi
+```
+
+telegram-send.sh 스크립트 파일
+
+```
+#!/bin/bash
+
+GROUP_ID='그룹ID 찾는 법은 구글링해서 찾으시길...'
+BOT_TOKEN='봇 토큰 찾는 법도 구글링해서 찾으시길...'
+
+DATE="$( date "+%Y-%m-%d %H:%M")"
+
+# this 3 checks (if) are not necessary but should be convenient
+if [ "$1" == "-h" ]; then
+  echo "Usage: `basename $0` \"text message\""
+  exit 0
+fi
+
+if [ -z "$1" ]
+  then
+    echo "Add message text as second arguments"
+    exit 0
+fi
+
+if [ "$#" -ne 1 ]; then
+    echo "You can pass only one argument. For string with spaces put it on quotes"
+    exit 0
+fi
+
+TXT="$DATE%0A$1"
+
+curl -s \
+  --data parse_mode=HTML \
+  --data "text=$TXT" \
+  --data "chat_id=$GROUP_ID" \
+  'https://api.telegram.org/bot'$BOT_TOKEN'/sendMessage' > /dev/null
+
+```
+
+
 ## 4. 디렉토리 구조
 
 ```
@@ -133,6 +196,7 @@ $ tree /data/minecraft/
     │   ├── banned-ips.json
     │   ├── banned-players.json
     │   ├── eula.txt
+    │   ├── join.dat
     │   ├── libraries
     │   │   ├── com
     │   │   │   ├── github
@@ -285,5 +349,8 @@ $ tree /data/minecraft/
     │       │   ├── r.0.-1.mca
     │       │   └── r.0.0.mca
     │       └── session.lock
-    └── docker-compose.yml
+    ├── docker-compose.yml
+    ├── setop.sh
+    ├── telegramsend.sh
+    └── whojoin.sh
 ```
