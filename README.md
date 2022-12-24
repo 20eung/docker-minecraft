@@ -266,7 +266,82 @@ $ sudo crontab -l
 
 
 ***
-## 10. 디렉토리 구조
+## 10. 서버가 시작(기동)될 때 텔레그램으로 알림 발송 스크립트
+
+> /usr/local/bin/telegram-send-startup
+
+```
+#!/usr/bin/bash
+
+GROUP_ID='그룹ID 찾는 법은 구글링해서 찾으시길...'
+BOT_TOKEN='봇 토큰 찾는 법도 구글링해서 찾으시길...'
+
+DATE="$( date "+%Y-%m-%d %H:%M")"
+
+TXT="$DATE%0A$HOSTNAME: Server is Started"
+
+curl -s \
+  --data "text=$TXT" \
+  --data "chat_id=$GROUP_ID" \
+  'https://api.telegram.org/bot'$BOT_TOKEN'/sendMessage' > /dev/null
+```
+
+> 서비스 등록
+
+```
+$ sudo crontab -e
+
+@reboot /usr/local/bin/telegram-send-startup
+```
+
+
+***
+## 11. 서버가 종료될 때 텔레그램으로 알림 발송 스크립트
+
+> /usr/local/bin/telegram-send-stop
+
+```
+#!/usr/bin/bash
+
+GROUP_ID='그룹ID 찾는 법은 구글링해서 찾으시길...'
+BOT_TOKEN='봇 토큰 찾는 법도 구글링해서 찾으시길...'
+
+DATE="$( date "+%Y-%m-%d %H:%M")"
+
+TXT="$DATE%0A$HOSTNAME: Server is Stopped"
+
+curl -s \
+  --data "text=$TXT" \
+  --data "chat_id=$GROUP_ID" \
+  'https://api.telegram.org/bot'$BOT_TOKEN'/sendMessage' > /dev/null
+```
+
+> /usr/lib/systemd/system/telegram-stop.service
+
+```
+[Unit]
+Description=Pre-Shutdown Send Telegram messages
+DefaultDependencies=no
+Before=shutdown.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/telegram-send-stop
+
+[Install]
+WantedBy=halt.target reboot.target shutdown.target
+```
+
+> 서비스 등록
+
+```
+$ sudo systemctl daemon-reload
+
+$ sudo systemctl enable telegram-stop.service
+```
+
+***
+## 12. 디렉토리 구조
 
 ```
 $ tree /data/minecraft/
