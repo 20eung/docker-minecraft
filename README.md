@@ -35,9 +35,9 @@ services:
     ports:
       - 25565:25565
     environment:
-      - TZ:"Asia/Seoul"
-      - PUID:1000
-      - PGID:1000
+      - TZ="Asia/Seoul"
+      - PUID=1000
+      - PGID=1000
       - EULA=TRUE
     volumes:
       - /etc/timezone:/etc/timezone:ro
@@ -139,32 +139,66 @@ sudo docker exec mc mc-send-to-console op user2
 ```
 
 ***
-## 5. whojoin.sh 스크립트
+## 5. join-mc.sh 스크립트
 
 마인크래프트 서버에 유저가 참가(join)하거나 퇴장(left)하면.  
 텔레그램으로 알려주는 스크립트
 
 ```
-#!/usr/bin/bash
-HOME='/data/minecraft/mc'
-JOINS=`grep -E "joined | left" ${HOME}/data/logs/latest.log | wc -l`
-JOINS_OLD=`cat ${HOME}/data/join.dat`
+#!/usr/bin/sh
+MC="mc"
+HOME="/data/minecraft"
+FILE="$HOME/$MC/data/logs/latest.log"
 
-if [ "${JOINS}" == "${JOINS_OLD}" ]; then
-  echo "Equal"
-else
-  echo "Diff"
-  echo ${JOINS} > ${HOME}/data/join.dat
-
-  LAST=`grep -E "joined | left" ${HOME}/data/logs/latest.log | tail -1`
-  JOIN='['${HOSTNAME}'-mc1] '${LAST}
-  echo ${JOIN}
-  ${HOME}/telegram-send.sh "${JOIN}"
-fi
+tail -F -n 0 ${FILE} |\
+while read line
+do
+    case $line in
+        *"joined"*)
+          TXT=${MC}'[입장]'${line}
+          echo ${TXT}
+          /usr/local/bin/telegram-send "${TXT}"
+          ;;
+        *"left"*)
+          TXT='${MC}'][퇴장]'${line}
+          echo ${TXT}
+          /usr/local/bin/telegram-send "${TXT}"
+          ;;
+    esac
+done
 ```
 
 ***
-## 6. telegram-send.sh 스크립트
+## 6. start-mc.sh 스크립트
+
+마인크래프트 서버가 시작될 때 텔레그램으로 알려주는 스크립트
+
+```
+#!/usr/bin/sh
+MC="mc"
+
+TXT=${MC}' Minecraft Server is started!'
+echo ${TXT}
+/usr/local/bin/telegram-send "${TXT}"
+```
+
+***
+## 7. stop-mc.sh 스크립트
+
+마인크래프트 서버가 종료될 때 텔레그램으로 알려주는 스크립트
+
+```
+#!/usr/bin/sh
+MC="mc"
+
+TXT=${MC}' Minecraft Server is shutting down!'
+echo ${TXT}
+/usr/local/bin/telegram-send "${TXT}"
+```
+
+## 8. telegram-send.sh 스크립트
+
+텔레그램으로 문자열을 전송하는 스크립트
 
 ```
 #!/usr/bin/bash
@@ -202,7 +236,7 @@ curl -s \
 ```
 
 ***
-## 7. 반복 수행을 하기 위한 crontab 설정
+## 9. 반복 수행을 하기 위한 crontab 설정
 
 ```
 $ sudo crontab -e
@@ -215,14 +249,24 @@ $ sudo crontab -l
 # │ │  └── dates of month(1-31)
 # │ └── hours(0-23)
 # └── minutes(0-59)
-#
-# 매분마다 실행
-* * * * * /data/minecraft/mc/whojoin.sh
+
+# 서버 재기동되면 텔레그램으로 알림 발송 실행
+@reboot /usr/local/bin/telegram-send-startup
+
+# 특정 시간에 마인크래프트 도커를 실행하고,
+# 텔레그램으로 시작 문자 알림 발송하고,
+# 특정 유저가 참가(join)하거나 퇴장(left)하면 텔레그램으로 알림 발송
+05 19 * * * docker start mc1 && /data/minecraft/mc1/start-mc.sh && /data/minecraft/mc1/join-mc.sh &
+
+# 특정 시간에 마인크래프트 도커를 종료하고,
+# 텔레그램으로 종료 문자 알림 발송하고,
+# 특정 유자가 참가(join)하거나 퇴장(left)하면 텔레그램으로 알림 발송 스크립트 종료
+35 23 * * * docker stop mc1 && /data/minecraft/mc1/stop-mc.sh && killall join-mc.sh
 ```
 
 
 ***
-## 8. 디렉토리 구조
+## 10. 디렉토리 구조
 
 ```
 $ tree /data/minecraft/
@@ -386,9 +430,11 @@ $ tree /data/minecraft/
     │       │   └── r.0.0.mca
     │       └── session.lock
     ├── docker-compose.yml
+    ├── join-mc.sh
     ├── setop.sh
-    ├── telegramsend.sh
-    └── whojoin.sh
+    ├── start-mc.sh
+    ├── stop-mc.sh
+    └── telegram-send.sh
 ```
 
 
