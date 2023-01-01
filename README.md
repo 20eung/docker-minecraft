@@ -340,8 +340,16 @@ $ sudo systemctl daemon-reload
 $ sudo systemctl enable telegram-stop.service
 ```
 
+
 ***
-## 12. 디렉토리 구조
+## 12. connect docker container
+
+```
+docker exec -it minecraft /bin/bash
+```
+
+***
+## 13. 디렉토리 구조
 
 ```
 $ tree /data/minecraft/
